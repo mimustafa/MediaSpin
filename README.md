@@ -5,7 +5,6 @@
 
 ![screenshot](./screenshot.png)
 
-
 ## Prerequisites
 
 You need to have the following tech installed locally:
@@ -61,6 +60,7 @@ The idea is to track how Swedish media reports on different subjects by using se
 * Postgres
 * RabbitMQ
 * Client side Blazor (WebAssembly) - hence the initial load time :)
+* Vue.js (Currently porting the client, see visualizer2)  
 * The mediator pattern (without a library)
 * CQRS
 * Some hexagonal architecture principles in a microservices setting

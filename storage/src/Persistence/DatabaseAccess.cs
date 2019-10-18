@@ -99,24 +99,22 @@ namespace storage.Persistence
             var DistinctYearMonths = await _storageDbContext.Sentences
             .Select(s => new { s.Received.Year, s.Received.Month })
             .Distinct()
+            .OrderByDescending(s => s.Year)
+            .OrderByDescending(s => s.Month)
             .ToListAsync();
-
+            
             List<DateTime> yearMonths = DistinctYearMonths.Select(x => new DateTime(x.Year, x.Month, 1)).ToList();
             return yearMonths;
         }
         public async Task<List<Sentence>> GetSentencesAsync(GetSentencesQuery query)
         {
-            var keyword = await _storageDbContext.Keywords.Where(k => k.Text == query.Keyword).SingleOrDefaultAsync();
-            var sentences = await _storageDbContext.Sentences.Where(s => s.KeywordId == keyword.KeywordId
+            var sentences = await _storageDbContext.Sentences.Where(s => s.Keyword.Text == query.Keyword
             && s.Received.Year == query.YearMonth.Year
             && s.Received.Month == query.YearMonth.Month)
             .Include(s => s.Keyword)
             .Include(s => s.Source)
             .OrderByDescending(s => s.Received)
             .ToListAsync();
-
-            // List<Sentence> sentences = await _storageDbContext.Sentences
-            // .FromSqlInterpolated($"select * from public.\"Sentences\" s join public.\"Keywords\" k on s.\"KeywordId\" = k.\"KeywordId\" where k.\"Text\" = '{query.Keyword}' and date_part('year', s.\"Received\") = {query.YearMonth.Year} and date_part('month', s.\"Received\") = {query.YearMonth.Month};").ToListAsync();
 
             return sentences;
         }
