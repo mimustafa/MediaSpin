@@ -1,16 +1,11 @@
 # MediaSpin
 
-## Up and running at
-[mediaspin.johanhellgren.se](https://mediaspin.johanhellgren.se)  
-
-![screenshot](./screenshot.png)
-
 ## Prerequisites
 
 You need to have the following tech installed locally:
 
-* dotnet core 3.0.x. 
-* node 10.x. 
+* dotnet core 3.1 (LTS)
+* node 12.16 (LTS)
 * docker version 18.x. 
 * docker-compose version 1.23.x. 
 
@@ -32,20 +27,25 @@ First run the system and let tracker execute a full article fetch. Make sure tha
  (more about the dataset under Challanges below)
 
 ## What and why
-The idea is to track how Swedish media reports on different subjects by using sentiment analysis. The reason for doing this, besides that I find the idea interesting, is that I had an itch to build something after a couple of months on parental leave. So if you find this solution just a tad over engineered its because I wanted to learn and evaluate some new things as well as revisit some old ideas - and where should you do that if not in a hobby project? =)
+The idea is to track how Swedish media reports on different subjects by using sentiment analysis.
+This hobby project scratches two itches at once for me;  
+1) I find the idea interesting  
+2) I use this solution to learn, try and evaluate different *things* ... (hence the overengineering,
+ complex architecture and different versions of a single component)
 
-## How does it work?
 
-### simplified overview - its a pipeline
+## Conceptual overview
+             tracker (tracks and extracts articles containing keywords)  
+                |
+                |
+             analyzer (analyzes sentiment)
+                |
+                |
+             storage (stores analysis)
+            /       \          
+           /         \
+      visualizer     bot
 
-**tracker** (tracks and extracts articles containing keywords) =>  
-**analyzer** (analyzes sentiment) =>  
-**storage** (stores analysis) =>  
-**visualizer** (visualizes analysis)
-
-### whiteboard version
-
-![screenshot](./overview-drawing.jpg)
 
 
 ## Tech and other stuff in this project
@@ -55,7 +55,7 @@ The idea is to track how Swedish media reports on different subjects by using se
 * ML.NET
 * Sentiment (AFINN-based sentiment analysis for Node.js)
 * gRPC
-* NodeServices in .net core
+* NodeServices in .net core (soon to be replaced...)
 * Ef core
 * Postgres
 * RabbitMQ

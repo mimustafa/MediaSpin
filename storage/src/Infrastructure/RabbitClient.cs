@@ -1,11 +1,14 @@
 using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using tracker.Domain.Models;
-using tracker.Domain.Ports.Outbound;
+using src.Domain.Ports.Outbound;
+using storage.Domain.Models;
 
-namespace tracker.Infrastructure
+namespace src.Infrastructure
 {
     public class RabbitClient : IPipeline
     {
@@ -18,16 +21,15 @@ namespace tracker.Infrastructure
         {
             _logger = logger;
         }
-        public void SendForAnalysis(Article article)
+        public void SendToBot(AnalyzedSentence analyzedSentence)
         {
-            _logger.LogInformation($"sending article: {article.Header} for analysis");
+            _logger.LogInformation($"sending analyzed and stored sentence: {analyzedSentence.Sentence} to bot");
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
-            var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(article));
-            channel.BasicPublish("", "analytics_queue", properties, body);
-
+            var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(analyzedSentence));
+            channel.BasicPublish("", "bot_queue", properties, body);
         }
-        public void Open(Action done)
+        public void Open()
         {
             var rabbitPassword = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS");
             _logger.LogInformation("connecting to rabbitmq");
@@ -37,7 +39,6 @@ namespace tracker.Infrastructure
             connection = TryOpenConnection(connection, factory);
             channel = connection.CreateModel();
             _logger.LogInformation("connected to rabbitmq");
-            done();
         }
         private IConnection TryOpenConnection(IConnection connection, ConnectionFactory factory, int attempt = 0)
         {
@@ -73,9 +74,5 @@ namespace tracker.Infrastructure
             }
         }
 
-        public bool IsConnectionsOpen()
-        {
-            return connection.IsOpen && channel.IsOpen;
-        }
     }
 }

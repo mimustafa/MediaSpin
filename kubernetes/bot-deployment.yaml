@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.14.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: bot
+  name: bot
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: bot
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: bot
+    spec:
+      containers:
+      - env:
+        - name: LOG_LEVEL
+          value: info
+        - name: TWITTER_BOT_ENABLED
+          value: 'true'
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              key: rabbitpassword
+              name: rabbitpassword
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              key: rabbituser
+              name: rabbituser
+        - name: TWITTER_CONSUMER_KEY
+          valueFrom:
+            secretKeyRef:
+              key: twitterconsumerkey
+              name: twitterconsumerkey
+        - name: TWITTER_CONSUMER_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: twitterconsumersecret
+              name: twitterconsumersecret
+        - name: TWITTER_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: twitteraccesstoken
+              name: twitteraccesstoken
+        - name: TWITTER_ACCESS_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: twitteraccesstokensecret
+              name: twitteraccesstokensecret
+        image: hellgrenj/projects:mediaspin-botv6
+        name: bot
+        resources: 
+          limits: {}
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: botlogs
+status: {}
